@@ -69,13 +69,14 @@ function getDirContents($dir, $excludeFiles, $excludeDir, &$results = array()) {
 	$dirContents = scandir($dir);
 
 	foreach($dirContents as $item) {
-		if(!is_dir($item)) { // item is a file
+		$path = realpath($dir.DIRECTORY_SEPARATOR.$item);
+		if(!is_dir($path)) { // item is a file
 			if(!in_array($item, $excludeFiles)) {
-				$path = realpath($dir.DIRECTORY_SEPARATOR.$item);
-				$results[] = getFileInfo($path, $item);
+				$name = end(explode(DIRECTORY_SEPARATOR, $path));
+				$results[] = getFileInfo($path, $name);
 			}
 		} else if(!in_array($item, $excludeDir)) { // item is a directory... "We need to go deeper."
-			getDirContents($item, $excludeFiles, $excludeDir, $results); // search this directory with the POWER OF RECURSION!
+			getDirContents($path, $excludeFiles, $excludeDir, $results); // search this directory with the POWER OF RECURSION!
 		}
 	}
 	return $results;
