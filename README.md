@@ -1,5 +1,9 @@
 # PHP Directory Statistics
-A PHP page to give you statistics about your code in a target directory.
+A PHP page to give you statistics about your code and files in a given directory.
+
+## Supported Statistics
+* File size
+* Number of lines
 
 ## Recommended Changes for Your Use
 * Update $excludeFiles and $excludeDir arrays
