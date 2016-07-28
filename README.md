@@ -18,4 +18,4 @@ A PHP page to give you statistics about your code and files in a given directory
 
 ## Optional Changes
 * Change units for file sizes (see the getFileInfo function)
-* Change colors for diagrams (change hex values in the CSS inside the <style> tag)
+* Change colors for diagrams (change hex values in the CSS inside the style tag)
