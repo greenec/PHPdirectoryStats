@@ -5,6 +5,12 @@ A PHP page to give you statistics about your code and files in a given directory
 * File size
 * Number of lines
 
+## Supported file types
+* PHP
+* JavaScript
+* HTML
+* CSS
+
 ## Recommended Changes for Your Use
 * Update $excludeFiles and $excludeDir arrays
 * Update $dir path
