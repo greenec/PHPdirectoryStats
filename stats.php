@@ -11,6 +11,8 @@ $excludeDir = array('.', '..', 'fonts', 'img');
 // use './' for the current directory, or an absolute path
 $dir = './';
 
+// set this to false if you don't want to see all TODOs in a repository
+$showTODOs = true;
 $TODOs = array();
 
 $dirContents = getDirContents($dir, $excludeFiles, $excludeDir, $TODOs);
@@ -75,7 +77,16 @@ function getDirContents($dir, $excludeFiles, $excludeDir, &$TODOs, &$results = a
 		if(!is_dir($path)) { // item is a file
 			if(!in_array($item, $excludeFiles)) {
 				$name = end(explode(DIRECTORY_SEPARATOR, $path));
-				$results[] = getFileInfo($path, $name, $TODOs);
+				$results[] = getFileInfo($path, $name);
+
+				// look for TODOs
+				$file = file($path);
+				for($i = 0; $i < count($file); $i++) {
+					if(strpos($file[$i], 'TODO') !== false) {
+						$str = $item . ' line ' . ($i + 1) . ': ' . $file[$i];
+						array_push($TODOs, $str);
+					}
+				}
 			}
 		} else if(!in_array($item, $excludeDir)) { // item is a directory... "We need to go deeper."
 			getDirContents($path, $excludeFiles, $excludeDir, $TODOs, $results); // search this directory with the POWER OF RECURSION!
@@ -84,7 +95,7 @@ function getDirContents($dir, $excludeFiles, $excludeDir, &$TODOs, &$results = a
 	return $results;
 }
 
-function getFileInfo($path, $item, &$TODOs) {
+function getFileInfo($path, $item) {
 	if(strpos($item, '.php') !== false) {
 		$type = "PHP";
 	} else if(strpos($item, '.js') !== false) {
@@ -109,14 +120,6 @@ function getFileInfo($path, $item, &$TODOs) {
 		$lines = $lines + substr_count($line, PHP_EOL);
 	}
 	fclose($handle);
-
-	$file = file($path);
-	for($i = 0; $i < count($file); $i++) {
-		if(strpos($file[$i], 'TODO') !== false) {
-			$str = $item . ' line ' . ($i + 1) . ': ' . $file[$i];
-			array_push($TODOs, $str);
-		}
-	}
 
 	return new File($path, $item, $type, $size, $lines);
 }
@@ -294,18 +297,17 @@ tr:nth-child(even) {
 <span class='legendColor green'></span>
 <p class='legendText'>CSS (<?php echo "$cssSP - $cssSize KB";  ?>)&nbsp;</p>
 
-
-<h3 style='margin-bottom: 0;'>TODO's</h3>
-
 <?php
 
-foreach($TODOs as $TODO) {
-	echo '<br>' . $TODO . '<br>';
+if($showTODOs) {
+	echo "<h3 style='margin-bottom: 0;'>TODO's</h3>";
+	foreach($TODOs as $TODO) {
+		echo '<br>' . $TODO . '<br>';
+	}
+	echo "<br>";
 }
 
 ?>
-
-<br>
 
 </body>
 </html>
