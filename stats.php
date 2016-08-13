@@ -11,7 +11,9 @@ $excludeDir = array('.', '..', 'fonts', 'img');
 // use './' for the current directory, or an absolute path
 $dir = './';
 
-$dirContents = getDirContents($dir, $excludeFiles, $excludeDir);
+$TODOs = array();
+
+$dirContents = getDirContents($dir, $excludeFiles, $excludeDir, $TODOs);
 
 $totalSize = 0;
 $totalLines = 0;
@@ -65,7 +67,7 @@ $cssSP = calcSP($cssSize, $totalSize);
 // I modified a snippet of code that I found on Stack Overflow to
 // recursively search all directories in a given directory for a file
 // see http://stackoverflow.com/questions/24783862/list-all-the-files-and-folders-in-a-directory-with-php-recursive-function
-function getDirContents($dir, $excludeFiles, $excludeDir, &$results = array()) {
+function getDirContents($dir, $excludeFiles, $excludeDir, &$TODOs, &$results = array()) {
 	$dirContents = scandir($dir);
 
 	foreach($dirContents as $item) {
@@ -73,16 +75,16 @@ function getDirContents($dir, $excludeFiles, $excludeDir, &$results = array()) {
 		if(!is_dir($path)) { // item is a file
 			if(!in_array($item, $excludeFiles)) {
 				$name = end(explode(DIRECTORY_SEPARATOR, $path));
-				$results[] = getFileInfo($path, $name);
+				$results[] = getFileInfo($path, $name, $TODOs);
 			}
 		} else if(!in_array($item, $excludeDir)) { // item is a directory... "We need to go deeper."
-			getDirContents($path, $excludeFiles, $excludeDir, $results); // search this directory with the POWER OF RECURSION!
+			getDirContents($path, $excludeFiles, $excludeDir, $TODOs, $results); // search this directory with the POWER OF RECURSION!
 		}
 	}
 	return $results;
 }
 
-function getFileInfo($path, $item) {
+function getFileInfo($path, $item, &$TODOs) {
 	if(strpos($item, '.php') !== false) {
 		$type = "PHP";
 	} else if(strpos($item, '.js') !== false) {
@@ -107,6 +109,14 @@ function getFileInfo($path, $item) {
 		$lines = $lines + substr_count($line, PHP_EOL);
 	}
 	fclose($handle);
+
+	$file = file($path);
+	for($i = 0; $i < count($file); $i++) {
+		if(strpos($file[$i], 'TODO') !== false) {
+			$str = $item . ' line ' . ($i + 1) . ': ' . $file[$i];
+			array_push($TODOs, $str);
+		}
+	}
 
 	return new File($path, $item, $type, $size, $lines);
 }
@@ -223,13 +233,6 @@ tr:nth-child(even) {
 
 	<tr>
 		<th></th>
-		<th>JavaScript</th>
-		<th><?php echo $jsSize; ?> KB</th>
-		<th><?php echo $jsLines; ?> lines of JavaScript</th>
-	</tr>
-
-	<tr>
-		<th></th>
 		<th>PHP</th>
 		<th><?php echo $phpSize; ?> KB</th>
 		<th><?php echo $phpLines; ?> lines of PHP</th>
@@ -237,9 +240,9 @@ tr:nth-child(even) {
 
 	<tr>
 		<th></th>
-		<th>CSS</th>
-		<th><?php echo $cssSize; ?> KB</th>
-		<th><?php echo $cssLines; ?> lines of CSS</th>
+		<th>JavaScript</th>
+		<th><?php echo $jsSize; ?> KB</th>
+		<th><?php echo $jsLines; ?> lines of JavaScript</th>
 	</tr>
 
 	<tr>
@@ -247,6 +250,13 @@ tr:nth-child(even) {
 		<th>HTML</th>
 		<th><?php echo $htmlSize; ?> KB</th>
 		<th><?php echo $htmlLines; ?> lines of HTML</th>
+	</tr>
+
+	<tr>
+		<th></th>
+		<th>CSS</th>
+		<th><?php echo $cssSize; ?> KB</th>
+		<th><?php echo $cssLines; ?> lines of CSS</th>
 	</tr>
 </table>
 
@@ -283,6 +293,19 @@ tr:nth-child(even) {
 <p class='legendText'>HTML (<?php echo "$htmlSP - $htmlSize KB";  ?>)&nbsp;</p>
 <span class='legendColor green'></span>
 <p class='legendText'>CSS (<?php echo "$cssSP - $cssSize KB";  ?>)&nbsp;</p>
+
+
+<h3 style='margin-bottom: 0;'>TODO's</h3>
+
+<?php
+
+foreach($TODOs as $TODO) {
+	echo '<br>' . $TODO . '<br>';
+}
+
+?>
+
+<br>
 
 </body>
 </html>
