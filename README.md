@@ -18,6 +18,7 @@ A PHP page to give you statistics about your code and files in a given directory
 * Update $excludeFiles and $excludeDir arrays
 * Update $dir path
 * Add or remove file types
+* Set $showTODOs
 
 ## Optional Changes
 * Change units for file sizes (see the getFileInfo function)
