@@ -1,6 +1,9 @@
 # PHP Directory Statistics
 A PHP page to give you statistics about your code and files in a given directory.
 
+## What's New
+* TODO Finder
+
 ## Supported Statistics
 * File size
 * Number of lines
