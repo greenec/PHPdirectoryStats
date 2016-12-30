@@ -2,7 +2,7 @@
 
 // NOTE: these should be changed to suit your project
 // exclude web server configs, frameworks/libraries, etc.
-$excludeFiles = array('.htaccess', 'bootstrap.min.js', 'bootstrap.min.css', 'jquery.min.js', 'stats.php');
+$excludeFiles = array('bootstrap.min.js', 'bootstrap.min.css', 'jquery.min.js', 'stats.php');
 // NOTE: ALWAYS keep '.' and '..' in this array
 // exclude directories such as fonts and images
 $excludeDir = array('.', '..', 'fonts', 'img');
@@ -75,8 +75,9 @@ function getDirContents($dir, $excludeFiles, $excludeDir, &$TODOs, &$results = a
 	foreach($dirContents as $item) {
 		$path = realpath($dir.DIRECTORY_SEPARATOR.$item);
 		if(!is_dir($path)) { // item is a file
-			if(!in_array($item, $excludeFiles)) {
-				$name = end(explode(DIRECTORY_SEPARATOR, $path));
+			if(!in_array($item, $excludeFiles) && !strpos($item, '.gz')) {
+				$filePathArray = explode(DIRECTORY_SEPARATOR, $path);
+				$name = end($filePathArray);
 				$results[] = getFileInfo($path, $name);
 
 				// look for TODOs
