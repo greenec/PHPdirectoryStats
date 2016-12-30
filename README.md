@@ -3,6 +3,8 @@ A PHP page to give you statistics about your code and files in a given directory
 
 ## What's New
 * TODO Finder
+* No longer searches gzipped files
+* Fixed a PHP end() bug
 
 ## Supported Statistics
 * File size
