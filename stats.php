@@ -23,48 +23,33 @@ $totalLines = 0;
 // NOTE: add or remove these as needed for your setup, but also
 // make sure that you make those changes in the getFileInfo function,
 // in the loop that creates the table, and in the diagrams
-$phpLines = 0;
-$phpSize = 0;
-
-$jsLines = 0;
-$jsSize = 0;
-
-$htmlLines = 0;
-$htmlSize = 0;
-
-$cssLines = 0;
-$cssSize = 0;
+$size = [
+    'PHP' => 0,
+    'JavaScript' => 0,
+    'HTML' => 0,
+    'CSS' => 0
+];
+$lines = $size;
 
 foreach($dirContents as $item) {
 	$totalSize += $item->size;
 	$totalLines += $item->lines;
 
-	if($item->type == 'PHP') {
-		$phpLines += $item->lines;
-		$phpSize += $item->size;
-	} else if($item->type == 'JavaScript') {
-		$jsLines += $item->lines;
-		$jsSize += $item->size;
-	} else if($item->type == 'HTML') {
-		$htmlLines += $item->lines;
-		$htmlSize += $item->size;
-	} else if($item->type == 'CSS') {
-		$cssLines += $item->lines;
-		$cssSize += $item->size;
-	}
+	$lines[$item->type] += $item->lines;
+	$size[$item->type] += $item->size;
 }
 
-$phpLP = calcLP($phpLines, $totalLines);
-$phpSP = calcSP($phpSize, $totalSize);
+$phpLP = calcLP($lines['PHP'], $totalLines);
+$phpSP = calcSP($size['PHP'], $totalSize);
 
-$jsLP = calcLP($jsLines, $totalLines);
-$jsSP = calcSP($jsSize, $totalSize);
+$jsLP = calcLP($lines['JavaScript'], $totalLines);
+$jsSP = calcSP($size['JavaScript'], $totalSize);
 
-$htmlLP = calcLP($htmlLines, $totalLines);
-$htmlSP = calcSP($htmlSize, $totalSize);
+$htmlLP = calcLP($lines['HTML'], $totalLines);
+$htmlSP = calcSP($size['HTML'], $totalSize);
 
-$cssLP = calcLP($cssLines, $totalLines);
-$cssSP = calcSP($cssSize, $totalSize);
+$cssLP = calcLP($lines['CSS'], $totalLines);
+$cssSP = calcSP($size['CSS'], $totalSize);
 
 // I modified a snippet of code that I found on Stack Overflow to
 // recursively search all directories in a given directory for a file
@@ -75,7 +60,7 @@ function getDirContents($dir, $excludeFiles, $excludeDir, &$TODOs, &$results = a
 	foreach($dirContents as $item) {
 		$path = realpath($dir.DIRECTORY_SEPARATOR.$item);
 		if(!is_dir($path)) { // item is a file
-			if(!in_array($item, $excludeFiles) && !strpos($item, '.gz')) {
+			if(!in_array($item, $excludeFiles) && !strpos($item, '.gz') && !strpos($item, '.log') && !strpos($item, '.min')) {
 				$filePathArray = explode(DIRECTORY_SEPARATOR, $path);
 				$name = end($filePathArray);
 				$results[] = getFileInfo($path, $name);
@@ -101,7 +86,7 @@ function getFileInfo($path, $item) {
 		$type = "PHP";
 	} else if(strpos($item, '.js') !== false) {
 		$type = "JavaScript";
-	} else if(strpos($item, '.html') !== false) {
+	} else if(strpos($item, '.html') !== false || strpos($item, '.mustache') !== false) {
 		$type = "HTML";
 	} else if(strpos($item, '.css') !== false) {
 		$type = "CSS";
@@ -134,7 +119,7 @@ function calcSP($size, $totalSize) {
 }
 
 Class File {
-	function File($path, $name, $type, $size, $lines) {
+	function __construct($path, $name, $type, $size, $lines) {
 		$this->path = $path;
 		$this->name = $name;
 		$this->type = $type;
@@ -149,67 +134,67 @@ Class File {
 <html>
 <head>
 	<title>Repository Stats</title>
+
+	<style>
+		body {
+			font-family: Arial, sans-serif;
+		}
+		/* table styles */
+		table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+		td, th {
+			border: 1px solid #dddddd;
+			text-align: left;
+			padding: 8px;
+		}
+		tr:nth-child(even) {
+			background-color: #dddddd;
+		}
+		/* diagrams styles */
+		.pBar {
+			height: 30px;
+			display: inline-block;
+		}
+		.legendColor {
+			width: 15px;
+			height: 15px;
+			display: inline-block;
+		}
+		.legendText {
+			display: inline-block;
+		}
+		.noLeftMargin {
+			margin-left: -5px
+		}
+		.left-edge {
+			border-top-left-radius: 5px;
+			border-bottom-left-radius: 5px;
+		}
+		.right-edge {
+			border-top-right-radius: 5px;
+			border-bottom-right-radius: 5px;
+		}
+		.center {
+			text-align: center;
+		}
+		/* colors */
+		.green {
+			background-color: #79BFA1;
+		}
+		.blue {
+			background-color: #A3CBF1;
+		}
+		.red {
+			background-color: #FB7374;
+		}
+		.orange {
+			background-color: #F5A352;
+		}
+	</style>
 </head>
 <body>
-
-<style>
-body {
-	font-family: Arial, sans-serif;
-}
-/* table styles */
-table {
-	border-collapse: collapse;
-	width: 100%;
-}
-td, th {
-	border: 1px solid #dddddd;
-	text-align: left;
-	padding: 8px;
-}
-tr:nth-child(even) {
-	background-color: #dddddd;
-}
-/* diagrams styles */
-.pBar {
-	height: 30px;
-	display: inline-block;
-}
-.legendColor {
-	width: 15px;
-	height: 15px;
-	display: inline-block;
-}
-.legendText {
-	display: inline-block;
-}
-.noLeftMargin {
-	margin-left: -5px
-}
-.left-edge {
-	border-top-left-radius: 5px;
-	border-bottom-left-radius: 5px;
-}
-.right-edge {
-	border-top-right-radius: 5px;
-	border-bottom-right-radius: 5px;
-}
-.center {
-	text-align: center;
-}
-/* colors */
-.green {
-	background-color: #79BFA1;
-}
-.blue {
-	background-color: #A3CBF1;
-}
-.red {
-	background-color: #FB7374;
-}
-.orange {
-	background-color: #F5A352;
-}
-</style>
 
 <table>
 	<tr>
@@ -238,29 +223,29 @@ tr:nth-child(even) {
 	<tr>
 		<th></th>
 		<th>PHP</th>
-		<th><?php echo $phpSize; ?> KB</th>
-		<th><?php echo $phpLines; ?> lines of PHP</th>
+		<th><?php echo $size['PHP']; ?> KB</th>
+		<th><?php echo $lines['PHP']; ?> lines of PHP</th>
 	</tr>
 
 	<tr>
 		<th></th>
 		<th>JavaScript</th>
-		<th><?php echo $jsSize; ?> KB</th>
-		<th><?php echo $jsLines; ?> lines of JavaScript</th>
+		<th><?php echo $size['JavaScript']; ?> KB</th>
+		<th><?php echo $lines['JavaScript']; ?> lines of JavaScript</th>
 	</tr>
 
 	<tr>
 		<th></th>
 		<th>HTML</th>
-		<th><?php echo $htmlSize; ?> KB</th>
-		<th><?php echo $htmlLines; ?> lines of HTML</th>
+		<th><?php echo $size['HTML']; ?> KB</th>
+		<th><?php echo $lines['HTML']; ?> lines of HTML</th>
 	</tr>
 
 	<tr>
 		<th></th>
 		<th>CSS</th>
-		<th><?php echo $cssSize; ?> KB</th>
-		<th><?php echo $cssLines; ?> lines of CSS</th>
+		<th><?php echo $size['CSS']; ?> KB</th>
+		<th><?php echo $lines['CSS']; ?> lines of CSS</th>
 	</tr>
 </table>
 
@@ -273,13 +258,13 @@ tr:nth-child(even) {
 </div>
 <br>
 <span class='legendColor blue'></span>
-<p class='legendText'>PHP (<?php echo "$phpLP - $phpLines lines"; ?>)&nbsp;</p>
+<p class='legendText'>PHP (<?php echo "$phpLP - " . $lines['PHP'] . " lines"; ?>)&nbsp;</p>
 <span class='legendColor orange'></span>
-<p class='legendText'>JavaScript (<?php echo "$jsLP - $jsLines lines"; ?>)&nbsp;</p>
+<p class='legendText'>JavaScript (<?php echo "$jsLP - " . $lines['JavaScript'] . " lines"; ?>)&nbsp;</p>
 <span class='legendColor red'></span>
-<p class='legendText'>HTML (<?php echo "$htmlLP - $htmlLines lines"; ?>)&nbsp;</p>
+<p class='legendText'>HTML (<?php echo "$htmlLP - " . $lines['HTML'] . " lines"; ?>)&nbsp;</p>
 <span class='legendColor green'></span>
-<p class='legendText'>CSS (<?php echo "$cssLP - $cssLines lines"; ?>)&nbsp;</p>
+<p class='legendText'>CSS (<?php echo "$cssLP - " . $lines['CSS'] . " lines"; ?>)&nbsp;</p>
 
 <h3>% by File Size</h3>
 <div class='center'>
@@ -290,20 +275,20 @@ tr:nth-child(even) {
 </div>
 <br>
 <span class='legendColor blue'></span>
-<p class='legendText'>PHP (<?php echo "$phpSP - $phpSize KB"; ?>)&nbsp;</p>
+<p class='legendText'>PHP (<?php echo "$phpSP - " . $size['PHP'] . " KB"; ?>)&nbsp;</p>
 <span class='legendColor orange'></span>
-<p class='legendText'>JavaScript (<?php echo "$jsSP - $jsSize KB";  ?>)&nbsp;</p>
+<p class='legendText'>JavaScript (<?php echo "$jsSP - " . $size['JavaScript'] . " KB"; ?>)&nbsp;</p>
 <span class='legendColor red'></span>
-<p class='legendText'>HTML (<?php echo "$htmlSP - $htmlSize KB";  ?>)&nbsp;</p>
+<p class='legendText'>HTML (<?php echo "$htmlSP - " . $size['HTML'] . " KB"; ?>)&nbsp;</p>
 <span class='legendColor green'></span>
-<p class='legendText'>CSS (<?php echo "$cssSP - $cssSize KB";  ?>)&nbsp;</p>
+<p class='legendText'>CSS (<?php echo "$cssSP - " . $size['CSS'] . " KB"; ?>)&nbsp;</p>
 
 <?php
 
 if($showTODOs) {
 	echo "<h3 style='margin-bottom: 0;'>TODO's</h3>";
 	foreach($TODOs as $TODO) {
-		echo '<br>' . $TODO . '<br>';
+		echo '<br>' . htmlspecialchars($TODO) . '<br>';
 	}
 	echo "<br>";
 }
